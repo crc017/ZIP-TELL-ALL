@@ -153,11 +153,7 @@ $("#entertainmentChecked").on("click", function(){
       console.log(payload);
       lat = payload.results[0].geometry.location.lat;
       long = payload.results[0].geometry.location.lng;
-     $("#map-canvas").css({
-        width: "100%",
-        height: "350px"
-
-    });
+ 
       initMap(lat, long, zip);
 
             // getAndPopulateWeather();
