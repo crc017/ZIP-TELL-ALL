@@ -12,10 +12,12 @@ var config = {
   storageBucket: "ziptellall.appspot.com",
   messagingSenderId: "383885543793"
 };
-firebase.initializeApp(config);
+// firebase.initializeApp(config);
 
 // Create a variable to reference the database.
-var database = firebase.database();
+// var database = firebase.database();
+
+var uluru;
 
 
 
@@ -31,197 +33,291 @@ $(document).ready(function () {
   var metricZip = "";
   var filter = [];
 
+// Rotate arrow back to original position if filter parameters are altered/clicked
+  $(".filter").click(function(){
+    $("#arrowRotate").removeClass("fa-rotate-90");
+    $("#map-canvas").empty();
+  });
+//*********************************** */
 
 
 
+//Select/deselect hospital parameter
+  $("#hospitalChecked").on("click", function(){
+    if(hospital.checked){
+      hospital.checked = false;
+      console.log("hospital.checked" + hospital.checked);
+      $(this).css(
+        
+        {
+          "background": "rgba(0, 0, 0, 0.5)",
+        });
+    } else {
+      hospital.checked = true;
+      console.log("hospital.checked" + hospital.checked);    
+      $(this).css(
+        "background-color", "black",
+        {
+        opacity: "0.5"
+    });  
+    }
+  });
+//*********************************** */
+
+
+//Select/deselect school parameter
+  $("#schoolChecked").on("click", function(){
+    if(school.checked){
+      school.checked = false;
+      console.log("school.checked" + school.checked);
+      $(this).css(
+        {
+          "background": "rgba(0, 0, 0, 0.5)",
+        });
+    } else {
+      school.checked = true;
+      console.log("school.checked" + school.checked);    
+      $(this).css(
+        "background-color", "black",
+        {
+        opacity: "0.5"
+    });  
+    }
+  });
+//*********************************** */
 
 
 
-  $("#zip-finder").on("click", getData);
-  // $("#pushButton").on("click",getMetricData);
+//Select/Deselect park parameter
+  $("#parkChecked").on("click", function(){
+    if(park.checked){
+      park.checked = false;
+      console.log("park.checked" + park.checked);
+      $(this).css(     
+        {
+          "background": "rgba(0, 0, 0, 0.5)",
+        });
+    } else {
+      park.checked = true;
+      console.log("park.checked" + park.checked);    
+      $(this).css(
+        "background-color", "black",
+        {
+        opacity: "0.5"
+    });  
+    }
+  });
+//*********************************** */
 
-  //    $("#zip-finder").on("click",getMetricData);
 
+//Select/Deselect entertainment parameter
+$("#entertainmentChecked").on("click", function(){
+  if(entertainment.checked){
+    entertainment.checked = false;
+    console.log("entertianment.checked" + entertainment.checked);
+    $(this).css(     
+      {
+        "background": "rgba(0, 0, 0, 0.5)",
+      });
+  } else {
+    entertainment.checked = true;
+    console.log("entertainment.checked" + entertainment.checked);    
+    $(this).css(
+      "background-color", "black",
+      {
+      opacity: "0.5"
+  });  
+  }
+});
+//*********************************** */
+
+
+//Execute getData() when arrow is clicked
+  $("#zipArrow").on("click", getData);
+
+//Establis getData function
   function getData() {
+    console.log("zip-finder has been clicked... getData executed")
 
     $("#map-canvas").empty();
-
+    $("#arrowRotate").addClass("fa-rotate-90");
     zip = $("#zipCode").val().trim();
 
 
     var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + zip + "&key=AIzaSyDaPZ5HfKbDDaPol5zPsE7-zvfUopTe41I";
-
+ 
     $.ajax({
       url: url,
       method: "GET"
     }).done(function (payload) {
       console.log(payload);
       lat = payload.results[0].geometry.location.lat;
-      long = payload.results[0].geometry.location.lng
+      long = payload.results[0].geometry.location.lng;
+     $("#map-canvas").css({
+        width: "100%",
+        height: "350px"
+
+    });
       initMap(lat, long, zip);
 
-            getAndPopulateWeather();
-
+            // getAndPopulateWeather();
+      
     }).fail(function () {
 
     }) // end ajax
-    //getMetricData(zip); 
-    getMetricData();
+    
   } // end getData
+//******************************************************** */
+var hospitalRequest;
+var schoolRequest;
+var entertainmentRequest;
+var amusementRequest
+var clubRequest;
+var theaterRequest;
+var musicRequest;
+var mallRequest;
+var venueRequest;
+var parkRequest;
 
+function Filter(name, checked, parameters) {
+  this.name = name;
+  this.checked = checked;
+  this.parameters = parameters;
+};
 
-}) // end ready
+const hospital = new Filter("hospital", false, [hospitalRequest]);
+const school = new Filter("school", false, [schoolRequest]);
+const entertainment = new Filter("entertainment", false, [entertainmentRequest, amusementRequest, clubRequest, theaterRequest, musicRequest, mallRequest, venueRequest]);
+const park = new Filter("park", false, [parkRequest]);
 
+const filterList = [hospital, school, entertainment, park];
+
+//********************************************************* */
 var map;
 var service;
 var infowindow;
 
 
-
-
-
+//initMap function
 function initMap(passLat, passLong, passZip) {
+  console.log("initMap executed");
 
-  var uluru = {
+  const uluru = {
     lat: passLat,
     lng: passLong
+  };
+  const hospitalRequest = {
+    location: uluru,
+    radius: '500',
+    query: "hospital"
+  };
+  
+  const schoolRequest = {
+    location: uluru,
+    radius: '500',
+    query: "school"
+  };
+  
+  const entertainmentRequest = {
+    location: uluru,
+    radius: '500',
+    query: "entertainment"
+  };
+  
+  const amusementRequest = {
+    location: uluru,
+    radius: '500',
+    query: "amusement"
+  };
+  
+  const clubRequest = {
+    location: uluru,
+    radius: '500',
+    query: "club"
+  };
+  
+  const theaterRequest = {
+    location: uluru,
+    radius: '500',
+    query: "cinema"
+  };
+  
+  const musicRequest = {
+    location: uluru,
+    radius: '500',
+    query: "music"
+  };
+  
+  const mallRequest = {
+    location: uluru,
+    radius: '500',
+    query: "mall"
+  };
+  
+  const venueRequest = {
+    location: uluru,
+    radius: '500',
+    query: "venue"
+  };
+  
+  const parkRequest = {
+    location: uluru,
+    radius: '500',
+    query: "parks"
   };
   map = new google.maps.Map(document.getElementById("map-canvas"), {
     center: uluru,
     zoom: 12
   });
 
-  var hospitalRequest = {
-    location: uluru,
-    radius: '500',
-    query: "hospital"
-  };
-
-  var schoolRequest = {
-    location: uluru,
-    radius: '500',
-    query: "school"
-  };
-
-  var entertainmentRequest = {
-    location: uluru,
-    radius: '500',
-    query: "entertainment"
-  };
-
-  var amusementRequest = {
-    location: uluru,
-    radius: '500',
-    query: "amusement"
-  };
-
-  var clubRequest = {
-    location: uluru,
-    radius: '500',
-    query: "club"
-  };
-
-  var theaterRequest = {
-    location: uluru,
-    radius: '500',
-    query: "cinema"
-  };
-
-  var musicRequest = {
-    location: uluru,
-    radius: '500',
-    query: "music"
-  };
-
-  var mallRequest = {
-    location: uluru,
-    radius: '500',
-    query: "mall"
-  };
-
-  var venueRequest = {
-    location: uluru,
-    radius: '500',
-    query: "venue"
-  };
-
-  var parkRequest = {
-    location: uluru,
-    radius: '500',
-    query: "parks"
-  };
-
-  // adding type iterators for the push to the firebase db
   service = new google.maps.places.PlacesService(map);
-  if ($("#hospital_checked").is(":checked")) {
+
+  if (hospital.checked) {
+    console.log("hospital.checked === true");
+    console.log("Hospital Parameters" + hospital.parameters);
+    console.log("hospital parameters.length" + hospital.parameters.length)
     service.textSearch(hospitalRequest, callback);
     typeHospital = 1;
   };
 
-  if ($("#school_checked").is(":checked")) {
+  if (school.checked) {
+    console.log("school.checked === true");
+    console.log("school Parameters" + school.parameters);
+    console.log("school parameters.length" + school.parameters.length)
     service.textSearch(schoolRequest, callback);
-    typeEducation = 1;
+    typeschool = 1;
   };
 
-  if ($("#entertainment_checked").is(":checked")) {
-    service.textSearch(entertainmentRequest, callback);
-    service.textSearch(amusementRequest, callback);
-    service.textSearch(clubRequest, callback);
-    service.textSearch(theaterRequest, callback);
-    service.textSearch(musicRequest, callback);
-    service.textSearch(mallRequest, callback);
-    service.textSearch(venueRequest, callback);
-    typeEntertainment = 1;
-
-  };
-
-  if ($("#park_checked").is(":checked")) {
+  if (park.checked) {
+    console.log("park.checked === true");
+    console.log("park Parameters" + park.parameters);
+    console.log("park parameters.length" + park.parameters.length)
     service.textSearch(parkRequest, callback);
-    typeSports = 1;
+    typepark = 1;
+  };
+
+  if (entertainement.checked) {
+    console.log("entertainement.checked === true");
+    console.log("entertainement Parameters" + entertainement.parameters);
+    console.log("entertainement parameters.length" + entertainement.parameters.length)
+    service.textSearch(entertainementRequest, callback);
+    typeentertainement = 1;
   };
 
 
-  typeArray.push(typeHospital);
-  typeArray.push(typeEducation);
-  typeArray.push(typeEntertainment);
-  typeArray.push(typeSports);
-
-  infowindow = new google.maps.InfoWindow();
-
-  console.log("type array " + typeArray);
-
-  // setting counts to firebase
-  loadFirebase(passZip, typeArray);
 } // end initMap
-
-function loadFirebase(passZip, passTypeArray) {
-
-  // getting data from firebase for metrics
-  // getMetricData(passZip);
+//************************************************************************************* */
 
 
-  //adding info to db
-  console.log("to load " + passZip + " " + passTypeArray[0]);
-
-  database.ref().push({
-    passZip: passZip,
-    typeHosp: passTypeArray[0],
-    typeEduc: passTypeArray[1],
-    typeEnte: passTypeArray[2],
-    typeSprt: passTypeArray[3],
-    dateAdded: firebase.database.ServerValue.TIMESTAMP
-  });
-
-
-
-} // end loadFirebase
 
 function callback(results, status) {
-
+  console.log("callback function hit");
   if (status === google.maps.places.PlacesServiceStatus.OK) {
+    console.log("callback function was executed/ status was OK ")
     for (var i = 0; i < results.length; i++) {
 
       createMarker(results[i]);
+      console.log("createMarker executed for: " + results[i]);
     }
   }
 } // end callBack
@@ -289,179 +385,4 @@ function createMarker(place) {
 } //end createMarker()
 
 
-//retrieves the initial data.
-database.ref().orderByChild("dateAdded").on("child_added", function(payload) {
-
- }) // 
-// getting firebase data for the zip..and 
-// graphing it
-function getMetricData() {
-
-  metricZip = $("#zipCode").val().trim();
-  var numOneTotal = 0;
-  var numTwoTotal = 0;
-  var numThreeTotal = 0;
-  var numFourTotal = 0;
-  var ref = database.ref();
-  var keyCount = 0;
-  var typeCountArray = [];
-
-  ref.orderByChild("passZip").equalTo(metricZip).on("child_added", function (snapshot) {
-
-    keyCount++;
-    numOneTotal = numOneTotal + snapshot.val().typeEduc;
-    numTwoTotal = numTwoTotal + snapshot.val().typeEnte;
-    numThreeTotal = numThreeTotal + snapshot.val().typeHosp;
-    numFourTotal = numFourTotal + snapshot.val().typeSprt;
-    //console.log("from getmetric data" + numOneTotal);
-
-  });
-
-
-  typeCountArray.push(numOneTotal);
-  typeCountArray.push(numTwoTotal);
-  typeCountArray.push(numThreeTotal);
-  typeCountArray.push(numFourTotal);
-
-  console.log("tpe count array " + typeCountArray);
-  setMetricSparklines(typeCountArray);
-
-} // end  getMetricData
-
-
-function setMetricSparklines(passArray) {
-
-  var ctx = document.getElementById("myMetricChart").getContext('2d');
-  var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["Schools", "Entertainment", "Hospitals", "Sports"],
-      datasets: [{
-        label: 'List of Types',
-        data: passArray,
-        //data: [1, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.8)',
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(255, 206, 86, 0.8)',
-          'rgba(75, 192, 192, 0.8)'
-          // 'rgba(153, 102, 255, 0.2)',
-          // 'rgba(255, 159, 64, 0.2)'
-        ],
-        borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255,99,132,1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)'
-          // 'rgba(153, 102, 255, 1)',
-          // 'rgba(255, 159, 64, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-
-      // onClick: handleClick,
-
-      scales: {
-        xAxes: [{
-          // barPercentage: .6,
-          barThickness: 25
-          // categoryPercentage: .5,
-          // samplePercentage: .7
-        }],
-        yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            // ,  
-            // steps: 5,
-            // stepValue: 1.5,
-            // max: 30,
-          }
-        }]
-      }
-    }
-  });
-} // end setMetricSparkLines
-// function setMetricSparklines(passArray){
-//    var ctx = document.getElementById("myChart").getContext('2d');
-//     var myChart = new Chart(ctx, {
-//         type: 'bar',
-//         data: {
-//             labels: ["Men", "Women"],
-//             datasets: [{
-//                 label: 'Basic Population Demographics',
-//                 data: popArray,
-//                 backgroundColor: [
-//                     'rgba(54, 162, 235, 0.8)',
-//                     'rgba(255, 99, 132, 0.8)'
-//                 ],
-//                 borderColor: [
-//                     'rgba(54, 162, 235, 1)',
-//                     'rgba(255,99,132,1)'
-//                 ],
-//                 borderWidth: 1
-//             }]
-//         },
-//         options: {
-
-//             // onClick: handleClick,
-
-//             scales: {
-//                 xAxes: [{
-//                     // barPercentage: .6,
-//                     barThickness: 25
-//                     // categoryPercentage: .5,
-//                     // samplePercentage: .7
-//                 }],
-//                 yAxes: [{
-//                     ticks: {
-//                         beginAtZero: true,
-//                         // ,  
-//                         // steps: 5,
-//                         // stepValue: 1.5,
-//                         // max: 30,
-//                     }
-//                 }]
-//             }
-//         }
-//     }); // end  cjart
-//   }
-
-function getAndPopulateWeather(){
-    var weatherLookupValues = {        
-        key: "e41744a703e55892",
-        url: ""
-    };
-    weatherLookupValues.url = "http://api.wunderground.com/api/" + weatherLookupValues.key + "/conditions/forecast/q/" + lat + "," + long + ".json";
-    
-
-    $.ajax({
-        type: "GET",
-        url: weatherLookupValues.url,
-        data: "data",
-        dataType: "JSON",
-        success: function (response) {
-            $("#weatherItems").empty();
-            var forecast = response.forecast.txt_forecast.forecastday;
-            for(i=0;i<forecast.length;i++){
-                var item = $("<div>").addClass("item weatherItem");
-                if(i===0) item.addClass("active");
-                var weatherHeader = $("<div>").addClass("weatherHeader");
-                var headline = $("<h2>").text(forecast[i].title).addClass("weatherDay");                
-                var icon = $("<img>").attr("src",forecast[i].icon_url).addClass("weatehrImage");
-                var body = $("<h3>").text(forecast[i].fcttext).css("padding-left","10px").css("padding-right","10px");
-                weatherHeader.append(headline);
-                weatherHeader.append(icon);
-                item.append(weatherHeader);
-                item.append(body);
-
-                $("#weatherItems").append(item);
-            }
-            
-        },
-        fail: function(){
-            $("#weatherItems").html("<h3>No weather information available for this location.</h3>");
-        }
-    });
-}
+}) // end ready
